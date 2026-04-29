@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 844c359b06f244ed9eeda6cc95d6fed6, type: 3}
+  m_Name: SwarmConfig
+  m_EditorClassIdentifier: 
+  AntHillPrefab: {fileID: 490601993697875186, guid: 12799e539d9ca5f44b0dde697f8eb23d, type: 3}
+  SwarmEnemyPrefab: {fileID: 8959013154831017809, guid: a93fdc0dbd44de544aa42d4dc2f52631, type: 3}
+  MaxHealth: 50
+  HitFlashMaterial: {fileID: 2100000, guid: 3e4ca77cc6a6c0e49a1f81f6ce7152d1, type: 2}
+  HitFlashDuration: 0.1
+  AttackDamage: 10
+  AttackRateSeconds: 1
+  SpawnIntervalSeconds: 2
+  SwarmSpeed: 0.75
+  SwarmRadius: 0.1

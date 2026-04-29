@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42bd19acbcc94ae5a48dd2cac8ebd53e, type: 3}
+  m_Name: AudioConfig
+  m_EditorClassIdentifier: 
+  BgmMappingPhase: {fileID: 8300000, guid: 049772f897f5def4f879dd4ceaa4b5c8, type: 3}
+  BgmPlayingPhases: []
+  SfxPrefab: {fileID: 1580439409720351688, guid: e20b9e1e41e866446b379d2566fd027e, type: 3}
+  SfxPoolSize: 20
+  SfxBallBounce: {fileID: 8300000, guid: 10f7b014b60019c44bde819b03bf8f64, type: 3}
+  SfxBalloonPop: {fileID: 8300000, guid: 47cbf00ab0186d4479288fc9395dfc4c, type: 3}
+  SfxSmokeFire: {fileID: 8300000, guid: 056ff3584aa7bdd4190bf0ebb84e02ec, type: 3}
+  SfxLaserGreen: {fileID: 8300000, guid: 0913c4c4064e3e748ad8b3fa5b8d6005, type: 3}
+  SfxLaserRed: {fileID: 8300000, guid: 312e6272cc6440542acf7a858ffea8d8, type: 3}
+  SfxTractorBeam: {fileID: 8300000, guid: ade953497240ad943af3555239ce5e11, type: 3}
+  SfxBulletFire: {fileID: 8300000, guid: 30af56732e942ac49be2ff107abea307, type: 3}
+  SfxBallDestroy: {fileID: 8300000, guid: 862227d7ddda48c499ce67c9b44b0cff, type: 3}

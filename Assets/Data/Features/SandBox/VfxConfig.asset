@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9f7a61a38e44492b3a491a85efc9594, type: 3}
+  m_Name: VfxConfig
+  m_EditorClassIdentifier: 
+  DefaultPoolSize: 10
+  VfxBallBounceDust: {fileID: 3005211300570195046, guid: ec36b62acb9fb35498096727f42ca9bd, type: 3}
+  VfxBalloonPopConfetti: {fileID: 6407514958457818179, guid: 7a94ea670e4fd1a4abb5476e6e9aebc2, type: 3}
+  VfxLaserHitSparks: {fileID: 196692910848522245, guid: 8e211c0ac8cb9df4aa6566be56cfe02c, type: 3}
+  VfxBallDestroyExplosion: {fileID: 7328654583492083179, guid: 288bb5983e253124f8f5218bda2f72c4, type: 3}

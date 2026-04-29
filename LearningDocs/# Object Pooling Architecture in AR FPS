@@ -1,0 +1,57 @@
+# 📝 Learning Notes: Object Pooling Architecture in AR FPS
+
+## 🧠 Core Philosophy (Why we pool)
+In a high-performance AR application (or any Unity game), constantly calling `Instantiate()` and `Destroy()` during gameplay is a death sentence for performance. 
+*   **Memory Allocation:** Instantiating creates C# heap allocations.
+*   **Garbage Collection (GC):** Destroying leaves dead memory that the GC must freeze the game to clean up, causing noticeable frame drops and stuttering.
+*   **Big-O Efficiency:** We use Unity's native `UnityEngine.Pool.ObjectPool<T>` which is backed by a Queue/Stack structure. Both `Enqueue` (put back) and `Dequeue` (take out) are **O(1)** operations (instantaneous), unlike removing from a `List<T>` which is **O(n)**.
+
+---
+
+## 🛑 The 3 Deadly Object Pool Traps
+
+Through building the AR FPS game, we identified and architected solutions for three major traps associated with Object Pools.
+
+### Trap 1: Phase 2 - The "Dirty Pool" Trap
+*   **The Problem:** When an object is returned to the pool, its internal state (velocity, health, timers, TrailRenderers, materials) is preserved. If pulled back out without cleaning, the object acts erratically.
+*   **The Solution:** Strictly enforce state resetting during the `actionOnRelease` or immediately after `Get()`. 
+
+### Trap 2: Phase 3 - The "Cold Start" (Unwarmed Pool) Trap
+*   **The Problem:** Setting `defaultCapacity: 100` in the constructor only allocates the internal array memory, it does *not* create the Unity GameObjects. The first time the player fires a gun, the pool is empty, forcing a massive CPU spike to instantiate 100 bullets on the fly.
+*   **The Solution (The Hoard & Return):** During a loading screen or `OnInit()`, we forcefully `Get()` the exact capacity into a temporary list, and then immediately `Release()` them all back. This forces the pool to forge unique instances upfront.
+
+### Trap 3: Phase 4 - The Overflow & Uncapped Framerate Trap
+*   **The Problem:** At 200+ FPS, standard timer logic (`timer >= interval`) fails. If `maxSize` is 50, but an uncapped framerate tries to return 100 dead objects simultaneously, the pool rejects the overflow and calls `Destroy()`. This creates a cyclic `Instantiate/Destroy` crash loop.
+*   **The Solution:** Decouple logic from the CPU framerate using a `while` loop accumulator (Catch-up loop).
+
+---
+
+## 🏗️ System-by-System Implementation Review
+
+### 1. Weapon System (`WeaponService.cs`)
+*   **What it pools:** `BulletView` (A "dumb" MonoBehaviour representing the physical bullet).
+*   **How it handles the traps:**
+    *   **Dirty Pool:** Fixed inside the `actionOnRelease` delegate. `if (b.Trail != null) b.Trail.Clear();` is called *before* `SetActive(false)`. If we didn't do this, bullets would draw a giant spaghetti laser across the screen from their last point of impact to the new barrel position.
+    *   **Cold Start:** Implements the "Hoard & Return" loop perfectly in `OnInit()`. 20 bullets are forged silently before the player ever pulls the trigger.
+    *   **Framerate Overflow:** The `HandleFiring()` method uses a catch-up loop: `while (_fireTimer >= _fireInterval) { FireBullet(); _fireTimer -= _fireInterval; }`. This guarantees exact RPM even if frames lag or spike.
+
+### 2. Enemy Spawning System (`TargetSpawningService.cs`)
+*   **What it pools:** `GameObject` (Ant Hills) and `SwarmEnemyController` (The AI Brain).
+*   **How it handles the traps:**
+    *   **Memory Allocation / Dirty Pool:** Originally, the system pooled the `SwarmEnemyView` but instantiated a `new SwarmEnemyController` every time. This caused GC spikes! It was refactored to pool the **Controller** itself. The `Controller.Reset()` method is called upon retrieval to cleanly restore Health, Speed, and clear hit-flash materials.
+    *   **Cold Start:** Added the "Hoard & Return" loop for both Ant Hills (5 instances) and Swarm Enemies (20 instances) to ensure Wave 1 starts without AR stutter.
+    *   **Framerate Overflow:** Replaced the simple `if` timer with a `while` catch-up loop to guarantee exactly *X* ants spawn per second, regardless of hardware speed.
+
+### 3. Room Mapping System (`BoundaryVisualsService.cs`)
+*   **What it pools:** `GameObject` (Markers, Obstacle Markers) and `LineRenderer` (Pillars, Polygon Outlines).
+*   **How it handles the traps:**
+    *   **Dirty Pool:** Passed flawlessly. When releasing `LineRenderers`, the pool action explicitly sets `lr.positionCount = 0;`. This wipes the geometry so the next time it is pulled, it doesn't draw wild polygons across the room.
+    *   **Cold Start:** *Intentionally ignored.* The pre-warm loops were skipped here because room mapping is driven by slow, manual human input (tapping a button every 3-5 seconds). The 1-millisecond GC spike to forge a single marker is completely invisible to the human eye, saving us unnecessary loading time.
+    *   **Framerate Overflow:** Passed natively. Spawning is decoupled from `Update/Time.deltaTime`. It is purely driven by `EventBus` callbacks (`OnPointAdded`), making it impossible to overflow the pool with raw framerate speed.
+
+---
+
+## 🔑 Key Takeaways
+1. **Pool the C# Logic, not just the Prefab:** If a game entity requires a C# class to run its logic (like an MVC Controller), pool the C# class wrapping the GameObject, not just the GameObject. This prevents the `new` keyword from triggering the Garbage Collector.
+2. **Never Trust `defaultCapacity`:** Unity's Object Pool needs to be forcefully exercised during loading screens using the "Hoard & Return" loop if you want to avoid mid-game stutter.
+3. **Clean Up Your Toys:** Always reset properties (Health, Timers, Trail Renderers, NavMesh Destinations) either right before they go back in the box (`actionOnRelease`) or the exact moment you take them out (`actionOnGet`).

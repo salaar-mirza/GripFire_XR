@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efce1350c4494ee081a8ffa340beb2e1, type: 3}
+  m_Name: SandboxConfig
+  m_EditorClassIdentifier: 
+  FanPrefab: {fileID: 6600009014612988397, guid: 9a8212149f75b734692d08125864b4ef, type: 3}
+  NumberOfFloorFans: 6
+  NumberOfCelingFans: 3
+  FanSpinSpeed: 750
+  FanMoveSpeed: 0.5
+  BallPrefab: {fileID: 5867188490152559347, guid: e0c438ce805a70f4b85049cab3d7fd29, type: 3}
+  BallPoolSize: 150
+  BallTimeOfFlight: 1.2
+  BallChaoticBounceForce: 1.5
+  LaserRange: 50
+  TractorBeamDistance: 0.5
+  LaserLaunchForce: 10
+  BalloonPrefab: {fileID: 7455525206676436427, guid: 37692847f372da84bb10247c036c64d1, type: 3}
+  BalloonPoolSize: 50
+  BalloonFloatForce: 12
+  BalloonBlowCooldown: 0.2
+  BalloonBlowForceMultiplier: 20
+  BalloonFanBounceForce: 7
+  SmokePrefab: {fileID: 4792623063879294760, guid: 065de33db9c2a0843bfd7e07e31abaf0, type: 3}
+  SmokePoolSize: 25
+  SmokeDuration: 4
+  SmokeChaoticBounceForce: 7
+  FanWhirClip: {fileID: 8300000, guid: 1566b0ea340de3e4d878efe805c64dbb, type: 3}
+  LaserHumClip: {fileID: 8300000, guid: 312e6272cc6440542acf7a858ffea8d8, type: 3}
+  TractorHumClip: {fileID: 8300000, guid: ade953497240ad943af3555239ce5e11, type: 3}

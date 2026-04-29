@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b83b785b090e4afba97e1cbf5e845577, type: 3}
+  m_Name: ShootHouseConfig
+  m_EditorClassIdentifier: 
+  MinCornersRequired: 4
+  BoundaryMarkerPrefab: {fileID: 1039842855356696606, guid: b56c56688167b6d4a85bdfda18260ea9, type: 3}
+  ObstacleMarkerPrefab: {fileID: 1039842855356696606, guid: da0bb443cb2f13241ae4ec7069c79b87, type: 3}
+  MeasurementTextPrefab: {fileID: 840801141783207524, guid: f6c763b2811beb040b15147ef111ddb8, type: 3}
