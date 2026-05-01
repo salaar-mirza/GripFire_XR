@@ -1,0 +1,211 @@
+@startuml GripFire_XR_Architecture
+
+allowmixing
+
+' --- VISUAL STYLING ---
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+skinparam padding 8
+skinparam componentStyle rectangle
+hide empty members
+hide circle
+
+skinparam class {
+    BackgroundColor White
+    BorderColor #2C3E50
+    ArrowColor #2C3E50
+    HeaderBackgroundColor #ECF0F1
+}
+
+skinparam package {
+    BackgroundColor #F8F9F9
+    BorderColor #BDC3C7
+}
+
+' --- CORE INFRASTRUCTURE ---
+package "Core Infrastructure (The Backbone)" {
+    class GameInitializer <<MonoBehaviour>> #E8F8F5
+    class GameService <<Service Locator>> #E8F8F5
+    class GameStateService #E8F8F5
+    queue EventBus <<The Radio Station>> #FDEDEC
+    
+    interface IService
+    interface ITickable
+}
+
+' The Initializer owns the boot sequence and ticking
+GameInitializer *-- GameService : " Composes & Registers"
+GameInitializer *-- ITickable : " Ticks"
+
+' --- DOMAIN MODULES (The Islands) ---
+
+package "Feature: Input & Player" {
+    class TouchInputService
+    class MicrophoneInputService
+    class HandTrackingService
+    class PlayerHealthService
+    class PlayerConfig <<Config>>
+    
+    PlayerHealthService --> PlayerConfig : " Reads"
+}
+
+package "Feature: Macro UI" {
+    class ModeSelectionController
+    class ModeSelectionView <<View>>
+    class CombatUIController
+    class CombatUIView <<View>>
+    
+    ModeSelectionController --> ModeSelectionView : " Updates"
+    CombatUIController --> CombatUIView : " Updates"
+}
+
+package "Feature: Room Mapping" {
+    class ManualRoomMappingService
+    class BoundaryVisualsService
+    class NavMeshBuilderService
+    class RoomMappingUIController
+    class RoomMappingUIView <<View>>
+    class VirtualRoomView <<View>>
+    class ManualRoomMappingConfig <<Config>>
+    
+    ManualRoomMappingService --> RoomMappingUIView : " Updates"
+    ManualRoomMappingService --> ManualRoomMappingConfig : " Reads"
+    BoundaryVisualsService --> FloorReticleView : " Spawns"
+    NavMeshBuilderService --> VirtualRoomView : " Spawns"
+}
+
+package "Feature: Swarm Combat" {
+    class TargetSpawningService
+    class LevelDirectorService
+    class WeaponService
+    class SwarmEnemyController
+    class SwarmEnemyView <<View>>
+    class WeaponView <<View>>
+    class BulletView <<View>>
+    class SwarmConfig <<Config>>
+    class WeaponConfig <<Config>>
+    class LevelConfig <<Config>>
+    
+    TargetSpawningService *-- SwarmEnemyController : " Pools"
+    SwarmEnemyController --> SwarmEnemyView : " Controls"
+    SwarmEnemyController --> SwarmConfig : " Reads"
+    WeaponService *-- BulletView : " Pools"
+    WeaponService --> WeaponView : " Uses"
+    WeaponService --> WeaponConfig : " Reads"
+    LevelDirectorService --> LevelConfig : " Reads"
+}
+
+package "Feature: Physics Sandbox" {
+    class SandboxEntityService
+    class SandboxWeaponService
+    class SandboxUIController
+    class SandboxUIView <<View>>
+    class SandboxFanController
+    class SandboxFanView <<View>>
+    class SandboxBallController
+    class SandboxBallView <<View>>
+    class SandboxBalloonController
+    class SandboxBalloonView <<View>>
+    class SandboxSmokeController
+    class SandboxSmokeView <<View>>
+    class SandboxConfig <<Config>>
+    
+    SandboxEntityService *-- SandboxFanController : " Pools"
+    SandboxFanController --> SandboxFanView : " Controls"
+    
+    SandboxWeaponService *-- SandboxBallController : " Pools"
+    SandboxBallController --> SandboxBallView : " Controls"
+    
+    SandboxWeaponService *-- SandboxBalloonController : " Pools"
+    SandboxBalloonController --> SandboxBalloonView : " Controls"
+    
+    SandboxWeaponService *-- SandboxSmokeController : " Pools"
+    SandboxSmokeController --> SandboxSmokeView : " Controls"
+    
+    SandboxWeaponService --> SandboxConfig : " Reads"
+    SandboxUIController --> SandboxUIView : " Updates"
+}
+
+package "Feature: Audio & VFX" {
+    class AudioService
+    class VfxService
+    class SfxView <<View>>
+    class VfxView <<View>>
+    class AudioConfig <<Config>>
+    class VfxConfig <<Config>>
+    
+    AudioService *-- SfxView : " Pools"
+    AudioService --> AudioConfig : " Reads"
+    VfxService *-- VfxView : " Pools"
+    VfxService --> VfxConfig : " Reads"
+}
+
+' --- LAYOUT HINTS FOR SQUARE CANVAS & LAYER GAPS ---
+
+' 1. Force a strict vertical gap between the Core Layer and the Feature Layers
+"Core Infrastructure (The Backbone)" -[hidden]down---> "Feature: Input & Player"
+"Core Infrastructure (The Backbone)" -[hidden]down---> "Feature: Room Mapping"
+
+' 2. Maintain the grid layout with spacing between the feature rows
+"Feature: Input & Player" -[hidden]right-> "Feature: Room Mapping"
+"Feature: Swarm Combat" -[hidden]right-> "Feature: Physics Sandbox"
+
+"Feature: Input & Player" -[hidden]down---> "Feature: Macro UI"
+"Feature: Room Mapping" -[hidden]down---> "Feature: Physics Sandbox"
+"Feature: Swarm Combat" -[hidden]down---> "Feature: Audio & VFX"
+
+"Feature: Macro UI" -[hidden]right-> "Feature: Physics Sandbox"
+"Feature: Physics Sandbox" -[hidden]right-> "Feature: Audio & VFX"
+
+' --- RELATIONSHIPS & INTERFACES ---
+
+' Make all major services implement the core interfaces
+GameStateService .up.|> IService
+
+TouchInputService .up.|> IService
+TouchInputService .up.|> ITickable
+MicrophoneInputService .up.|> IService
+MicrophoneInputService .up.|> ITickable
+HandTrackingService .up.|> IService
+HandTrackingService .up.|> ITickable
+PlayerHealthService .up.|> IService
+
+ModeSelectionController .up.|> IService
+CombatUIController .up.|> IService
+RoomMappingUIController .up.|> IService
+SandboxUIController .up.|> IService
+
+ManualRoomMappingService .up.|> IService
+ManualRoomMappingService .up.|> ITickable
+BoundaryVisualsService .up.|> IService
+BoundaryVisualsService .up.|> ITickable
+NavMeshBuilderService .up.|> IService
+
+TargetSpawningService .up.|> IService
+TargetSpawningService .up.|> ITickable
+LevelDirectorService .up.|> IService
+LevelDirectorService .up.|> ITickable
+WeaponService .up.|> IService
+WeaponService .up.|> ITickable
+
+SandboxEntityService .up.|> IService
+SandboxEntityService .up.|> ITickable
+SandboxWeaponService .up.|> IService
+SandboxWeaponService .up.|> ITickable
+
+AudioService .up.|> IService
+AudioService .up.|> ITickable
+VfxService .up.|> IService
+VfxService .up.|> ITickable
+
+' --- THE DECOUPLED COMMUNICATION ---
+' All domain modules talk ONLY to the EventBus, never to each other
+"Feature: Input & Player" .up.> EventBus : " Events"
+"Feature: Macro UI" .up.> EventBus : " Events"
+"Feature: Room Mapping" .up.> EventBus : " Events"
+"Feature: Swarm Combat" .up.> EventBus : " Events"
+"Feature: Physics Sandbox" .up.> EventBus : " Events"
+"Feature: Audio & VFX" .up.> EventBus : " Events"
+
+@enduml

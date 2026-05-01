@@ -16,6 +16,7 @@ using ARFps.Features.Player.UI;
 using UnityEngine.XR.ARFoundation;
 using ARFps.Features.LevelDirector;
 using ARFps.Features.Sandbox;
+using System.Collections.Generic;
 
 /// <summary>
 /// The central bootstrapper and lifecycle manager for the game.
@@ -64,6 +65,8 @@ public class GameInitializer : MonoBehaviour
     [SerializeField]
     private WeaponView _weaponView;
 
+    // Cached list of tickable services to completely prevent GC Allocations and Type Casting overhead during Update
+    private readonly List<ITickable> _tickableServices = new List<ITickable>();
     
     
     /// <summary>
@@ -115,6 +118,12 @@ public class GameInitializer : MonoBehaviour
         foreach (var service in GameService.GetAllServices())
         {
             service.OnInit();
+            
+            // Cache any service that requires a frame-by-frame tick
+            if (service is ITickable tickable)
+            {
+                _tickableServices.Add(tickable);
+            }
         }
 
         GameService.Get<GameStateService>().ChangeState(GameState.RoomScanning);
@@ -130,12 +139,10 @@ public class GameInitializer : MonoBehaviour
         // Flush any events that were published from background threads.
         EventBus.ProcessMainThreadActions();
         
-        foreach (var service in GameService.GetAllServices())
+        // A standard 'for' loop prevents IEnumerable boxing, achieving true 0B GC Allocation!
+        for (int i = 0; i < _tickableServices.Count; i++)
         {
-            if (service is ITickable tickableService)
-            {
-                tickableService.OnTick();
-            }
+            _tickableServices[i].OnTick();
         }
     }
 

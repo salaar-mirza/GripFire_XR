@@ -17,7 +17,8 @@ namespace ARFps.Features.PlayerInput
         
         private const int SampleWindow = 128;
         private const float BlowThreshold = 0.1f; // The volume required to trigger a blow
-
+        private readonly float[] _waveData = new float[SampleWindow]; // CACHED ARRAY
+        
         public void OnInit()
         {
 #if UNITY_ANDROID
@@ -66,13 +67,12 @@ namespace ARFps.Features.PlayerInput
             int micPosition = Microphone.GetPosition(_device) - (SampleWindow + 1);
             if (micPosition < 0) return;
 
-            float[] waveData = new float[SampleWindow];
-            _micClip.GetData(waveData, micPosition);
+            _micClip.GetData(_waveData, micPosition); //Overwrite the cached array!
 
             float levelMax = 0;
             for (int i = 0; i < SampleWindow; i++)
             {
-                float wavePeak = waveData[i] * waveData[i];
+                float wavePeak = _waveData[i] * _waveData[i];
                 if (levelMax < wavePeak) levelMax = wavePeak;
             }
             
