@@ -2,7 +2,7 @@
 
 A highly optimized, enterprise-grade Unity Augmented Reality prototype built with strict zero-allocation architecture, procedural geometry, and decoupled systems.
 
-[![Watch the Gameplay](Gallery/GripFireReadme.png)](https://www.youtube.com/watch?v=YOUR_YOUTUBE_VIDEO_ID)
+[![Watch the Gameplay](Gallery/GripFireReadme.png)](https://youtu.be/0p2rLwmTEx0?si=omZJLkfpbpYXto5j)
 *(Click the image above to watch the full AR gameplay demonstration on YouTube)*
 
 ### 🚀 Play the Prototype
